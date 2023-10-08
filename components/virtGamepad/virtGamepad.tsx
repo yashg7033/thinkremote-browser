@@ -15,12 +15,9 @@ const JOYSTICK_SIZE = 100
 
 export const VirtualGamepad = (props: {
     draggable: ButtonMode;
-    AxisCallback: (
-        x: number,
-        y: number,
-        type: "left" | "right"
-    ) => Promise<void>;
+    AxisCallback: ( x: number, y: number, type: "left" | "right") => Promise<void>;
     ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
+    positionCallback?: (side: 'left'|'right' , pos:{x: number, y: number}) => Promise<void>;
 }) => {
     const { draggable,
         AxisCallback,
@@ -36,12 +33,14 @@ export const VirtualGamepad = (props: {
                         AxisCallback={AxisCallback}
                         ButtonCallback={ButtonCallback}
                         draggable={draggable}
+                        moveCallback={(x,y) => props.positionCallback('left',{x,y})}
                     />
 
                     <ButtonGroupRight
                         AxisCallback={AxisCallback}
                         ButtonCallback={ButtonCallback}
                         draggable={draggable}
+                        moveCallback={(x,y) => props.positionCallback('right',{x,y})}
                     />
                 </ContainerVirGamepad>
             ) : null}
@@ -222,6 +221,18 @@ export const ButtonGroupRight = (props: ButtonGroupProps) => {
                     </StartBtn>
                 </ContainerSubButton>
             </Draggable>
+
+            <Draggable
+                disabled={props.draggable != "draggable"}
+                position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
+                onStop={handleStop}
+                onDrag={handleDrag}
+            >
+                <WrapperDraggable id="joystick">
+                    <JoyStick moveCallback={props.moveCallback} />
+                </WrapperDraggable>
+            </Draggable>
+
             <Draggable
                 disabled={props.draggable != "draggable"}
                 position={{ x: posBtn?.rs?.x, y: posBtn?.rs?.y }}
@@ -402,6 +413,19 @@ export const ButtonGroupLeft = (props: ButtonGroupProps) => {
 
                 </WrapperDraggable>
             </Draggable>
+            
+            <Draggable
+                disabled={props.draggable != "draggable"}
+                position={{ x: posBtn?.joystick?.x, y: posBtn?.joystick?.y }}
+                onStop={handleStop}
+                onDrag={handleDrag}
+            >
+                <WrapperDraggable id="joystick">
+                    <JoyStick moveCallback={props.moveCallback} />
+                </WrapperDraggable>
+            </Draggable>
+
+
             <Draggable
                 disabled={props.draggable != "draggable"}
                 position={{ x: posBtn?.ls?.x, y: posBtn?.ls?.y }}
@@ -430,6 +454,7 @@ interface ButtonGroupProps {
         y: number,
         type: "left" | "right"
     ) => Promise<void>;
+    moveCallback?: (x: number, y: number) => Promise<void>;
     ButtonCallback: (index: number, type: "up" | "down") => Promise<void>;
 }
 

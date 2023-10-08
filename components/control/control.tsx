@@ -24,7 +24,7 @@ export const ConTrolContext = createContext<{
 
 
 export const WebRTCControl = (input: {
-	touch_mode_callback				: (mode: 'trackpad' | 'gamepad' | 'mouse' | 'none') 	=> Promise<void>,
+	touch_mode_callback				: (mode: 'trackpad' | 'gamepad' | 'mouse' | 'none',data?:any)=> Promise<void>,
 	gamepad_callback_a				: (x: number, y: number, 	type: 'left' | 'right') 	=> Promise<void>,
 	gamepad_callback_b				: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
 	mouse_button_callback			: (index: number, 			type: 'up' | 'down') 		=> Promise<void>,
@@ -48,6 +48,7 @@ export const WebRTCControl = (input: {
 	const [OldTextValue,setOldTextValue] 			= useState<string[]>([]);
 	const [OpenControl, setOpenControl]  			= useState<boolean>(false)
 
+	const [pos,setpos] 								= useState<any>({});
 	const [Clipboard,setClipboard] 					= useState<boolean>(false);
     const inputRef 									= useRef<HTMLInputElement>(null);
 
@@ -92,7 +93,7 @@ export const WebRTCControl = (input: {
 				input.touch_mode_callback('trackpad')
 				break;
 			case 'static':
-				input.touch_mode_callback('gamepad')
+				input.touch_mode_callback('gamepad',pos)
 				break;
 			case 'draggable':
 				input.touch_mode_callback('none')
@@ -186,6 +187,15 @@ export const WebRTCControl = (input: {
 	}
 
 
+	const positionCallback = async (side: 'left' | 'right',new_pos: {x:number,y:number}) => {
+		let append = {}
+		if (side == 'left') 
+			append = {left:new_pos}
+		else
+			append = {right:new_pos}
+			
+		setpos({...pos,...append})
+	}
 
 
 
@@ -245,6 +255,7 @@ export const WebRTCControl = (input: {
 						? async (x,y,t) => {} 
 						: input.gamepad_callback_a}
 					draggable={enableVGamepad}
+					positionCallback={positionCallback}
 				/>
 
 				<Setting

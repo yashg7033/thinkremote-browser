@@ -373,8 +373,8 @@ export default function Home () {
     const fullscreenCallback = async function () {
         setIOSFullscreen(old => !old)
     }
-    const touchModeCallback=async function(mode: 'trackpad' | 'gamepad' | 'mouse' | 'none') { 
-        client?.hid?.setTouchMode(mode)
+    const touchModeCallback=async function(mode: 'trackpad' | 'gamepad' | 'mouse' | 'none',data?:any) { 
+        client?.hid?.setTouchMode(mode,data)
     } 
     const bitrateCallback= async function (bitrate: number) { 
         client?.ChangeBitrate(bitrate);
